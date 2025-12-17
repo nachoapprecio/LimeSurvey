@@ -29,16 +29,16 @@ fi
 # 3) Configuración persistente (NUNCA vacía)
 ###############################################################################
 
-# config.php
-if [ ! -f /data/config/config.php ]; then
+# config.php (si no existe O está vacío, lo re-crea con return array)
+if [ ! -s /data/config/config.php ]; then
   cat > /data/config/config.php <<'PHP'
 <?php
 return [];
 PHP
 fi
 
-# security.php
-if [ ! -f /data/config/security.php ]; then
+# security.php (si no existe O está vacío, lo re-crea con return array)
+if [ ! -s /data/config/security.php ]; then
   cat > /data/config/security.php <<'PHP'
 <?php
 return [];
