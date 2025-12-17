@@ -5,6 +5,7 @@ RUN a2enmod rewrite headers \
   && apt-get update && apt-get install -y \
     libpng-dev libjpeg-dev libfreetype6-dev \
     libzip-dev libicu-dev \
+    libonig-dev \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-install -j$(nproc) gd intl mbstring mysqli pdo pdo_mysql zip \
   && rm -rf /var/lib/apt/lists/*
