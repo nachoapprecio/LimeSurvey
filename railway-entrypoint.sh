@@ -10,7 +10,7 @@ mkdir -p /data/upload /data/tmp /data/config
 mkdir -p /data/tmp/runtime /data/tmp/assets /data/tmp/cache /data/tmp/upload
 
 ###############################################################################
-# 2) Symlinks correctos (NO borrar carpetas base del repo)
+# 2) Symlinks para upload y tmp (estos sí se persisten completos)
 ###############################################################################
 
 # upload
@@ -26,31 +26,31 @@ if [ ! -L /var/www/html/tmp ]; then
 fi
 
 ###############################################################################
-# 3) Configuración persistente (NUNCA vacía)
+# 3) Configuración persistente (SIN inventar config.php/security.php)
+#    - Deja que el instalador los genere.
+#    - Una vez existan, se copian a /data/config (una sola vez)
+#    - Y desde entonces, se enlazan desde /data/config.
 ###############################################################################
 
-# config.php (si no existe O está vacío, lo re-crea con return array)
-if [ ! -s /data/config/config.php ]; then
-  cat > /data/config/config.php <<'PHP'
-<?php
-return [];
-PHP
+# Si en el volumen existe config.php/security.php (generados previamente), enlázalos
+if [ -f /data/config/config.php ]; then
+  rm -f /var/www/html/application/config/config.php || true
+  ln -s /data/config/config.php /var/www/html/application/config/config.php
 fi
 
-# security.php (si no existe O está vacío, lo re-crea con return array)
-if [ ! -s /data/config/security.php ]; then
-  cat > /data/config/security.php <<'PHP'
-<?php
-return [];
-PHP
+if [ -f /data/config/security.php ]; then
+  rm -f /var/www/html/application/config/security.php || true
+  ln -s /data/config/security.php /var/www/html/application/config/security.php
 fi
 
-# Enlazar archivos persistentes (sin tocar internal.php)
-rm -f /var/www/html/application/config/config.php || true
-rm -f /var/www/html/application/config/security.php || true
+# Si el instalador ya creó los archivos en la app pero aún no existen en /data, cópialos una vez
+if [ ! -f /data/config/config.php ] && [ -f /var/www/html/application/config/config.php ]; then
+  cp /var/www/html/application/config/config.php /data/config/config.php
+fi
 
-ln -s /data/config/config.php /var/www/html/application/config/config.php
-ln -s /data/config/security.php /var/www/html/application/config/security.php
+if [ ! -f /data/config/security.php ] && [ -f /var/www/html/application/config/security.php ]; then
+  cp /var/www/html/application/config/security.php /data/config/security.php
+fi
 
 ###############################################################################
 # 4) Permisos (Apache corre como www-data)
