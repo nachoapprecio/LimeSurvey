@@ -1,7 +1,8 @@
 FROM php:8.2-apache
 
 # Apache + PHP extensions típicas para apps como LimeSurvey
-RUN a2enmod rewrite headers \
+RUN a2dismod mpm_event mpm_worker || true \
+  && a2enmod mpm_prefork rewrite headers \
   && apt-get update && apt-get install -y \
     libpng-dev libjpeg-dev libfreetype6-dev \
     libzip-dev libicu-dev \
